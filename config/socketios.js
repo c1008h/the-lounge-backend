@@ -9,7 +9,7 @@ const { createUniqueId } = require('../utils/tempIdGenerator')
 function setupSocket(server) {
     const io = new Server(server, {
         cors: {
-            origin: "*",
+            origin: process.env.WEBSITE_URL,
             methods: ["GET", "POST"]
         }
     })
