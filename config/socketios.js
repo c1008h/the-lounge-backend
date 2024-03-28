@@ -5,6 +5,10 @@ const { addParticipant } = require('../services/realtimeDatabase/participants')
 const { saveMessage } = require('../services/realtimeDatabase/message')
 const { searchFriend, addFriend, acceptRequest, declineRequest, deleteFriend, cancelRequest } = require('../services/firestore/friend')
 const { createUniqueId } = require('../utils/tempIdGenerator')
+const jwt = require('jsonwebtoken');
+
+const APP_SECRET = process.env.APP_SECRET;
+const ANON_TOKEN = process.env.ANON_TOKEN;
 
 function setupSocket(server) {
     const io = new Server(server, {
@@ -22,20 +26,21 @@ function setupSocket(server) {
     }
 
     io.use((socket, next) => {
+        console.log("Token received:", socket.handshake.auth.token);
         const token = socket.handshake.auth.token;
-        if (token) {
-          try {
-            const decodedToken = verifyToken(token); 
-            socket.userId = decodedToken.userId; 
-            console.log(`Authenticated user with ID: ${socket.userId}`);
-            return next();
-          } catch (error) {
-            console.error('Authentication failed:', error.message);
-            return next(new Error('Authentication error'));
-          }
+
+        if (token === ANON_TOKEN) {
+            next();
         } else {
-          console.error('Authentication token not provided');
-          return next(new Error('Authentication token not provided'));
+            try {
+                const decodedToken = verifyToken(token, APP_SECRET); 
+                socket.userId = decodedToken.userId; 
+                console.log(`Authenticated user with ID: ${socket.userId}`);
+                return next();
+            } catch (error) {
+                console.error('Authentication failed:', error.message);
+                return next(new Error('Authentication error'));
+            }
         }
     })
 
