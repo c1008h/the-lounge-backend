@@ -45,8 +45,7 @@ function setupSocket(server) {
     })
 
     io.on('connection', (socket) => {
-        console.log('a user connected');
-
+        console.log('a user connected to server');
 
         socket.on('createAnonSession', async (sessionId) => {
             console.log("SOCKET ROOM:", socket.rooms);
