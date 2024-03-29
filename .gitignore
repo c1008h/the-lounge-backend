@@ -1,5 +1,6 @@
 .env.local
 .env.production
+.env
 
 serviceAccountKey.json
 
