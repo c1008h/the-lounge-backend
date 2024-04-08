@@ -36,7 +36,7 @@ function setupSocket(server) {
             try {
                 const decodedToken = await admin.auth().verifyIdToken(token);
 
-                socket.userId = decodedToken.userId; 
+                socket.userId = decodedToken.uid; 
                 console.log(`Authenticated user with ID: ${socket.userId}`);
                 return next();
             } catch (error) {
