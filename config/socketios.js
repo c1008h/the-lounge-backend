@@ -6,6 +6,7 @@ const { saveMessage } = require('../services/realtimeDatabase/message')
 const { searchFriend, addFriend, acceptRequest, declineRequest, deleteFriend, cancelRequest } = require('../services/firestore/friend')
 const { createUniqueId } = require('../utils/tempIdGenerator')
 const jwt = require('jsonwebtoken');
+const admin = require('firebase-admin')
 
 const APP_SECRET = process.env.APP_SECRET;
 const ANON_TOKEN = process.env.ANON_TOKEN;
@@ -25,7 +26,7 @@ function setupSocket(server) {
         return numClients
     }
 
-    io.use((socket, next) => {
+    io.use(async (socket, next) => {
         console.log("Token received:", socket.handshake.auth.token);
         const token = socket.handshake.auth.token;
 
@@ -33,7 +34,8 @@ function setupSocket(server) {
             next();
         } else {
             try {
-                const decodedToken = verifyToken(token, APP_SECRET); 
+                const decodedToken = await admin.auth().verifyIdToken(token);
+
                 socket.userId = decodedToken.userId; 
                 console.log(`Authenticated user with ID: ${socket.userId}`);
                 return next();
