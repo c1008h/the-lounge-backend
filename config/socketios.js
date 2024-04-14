@@ -115,7 +115,7 @@ function setupSocket(server) {
             const chatSessionId = await createChatSession(data)
             await addChatSessionToUser(data, chatSessionId)
 
-            socket.emit('sessionAdded', chatSessionId)
+            io.in(chatSessionId).socket.emit('sessionAdded', chatSessionId)
         })
 
         socket.on('deleteSession', async (sessionId, userId) => {
